@@ -638,6 +638,14 @@ extension MergedSQLiteBookmarks: ShareToDestination {
     }
 }
 
+extension MergedSQLiteBookmarks: ModifiableBookmarks {
+    public func allowedModifications() -> Deferred<Maybe<[BookmarkModification]>> {
+        return self.buffer.isEmpty() >>== { isEmpty in
+            isEmpty ? deferMaybe([.New, .Update, .Move, .Delete]) : deferMaybe([])
+        }
+    }
+}
+
 // Not actually implementing SyncableBookmarks, just a utility for MergedSQLiteBookmarks to do so.
 extension SQLiteBookmarks {
     public func isUnchanged() -> Deferred<Maybe<Bool>> {
